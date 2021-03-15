@@ -1,17 +1,25 @@
 const { createClientForPath, getData, setData } = require("./client");
 const { env } = require("./environment");
-const { error, info } = require("./log");
+const { error, info, debug } = require("./log");
 
 const path = `${env.basePath}/${env.clientId}`;
 
 (async function run() {
+  let value;
   while (true) {
     try {
       info("Connecting");
-      const [client, initialData] = await createClientForPath(env.host, path);
-
+      const [client, initialValue] = await createClientForPath(env.host, path);
       info("Conntected");
-      await generateSequence(client, initialData);
+
+      if (!value) {
+        debug("Setting initial value", initialValue);
+        value = initialValue;
+      }
+      while (true) {
+        value = await generateNextSequenceValue(client, value);
+        debug("Gererating sequence value", value);
+      }
     } catch (e) {
       error("Failed to operate! Going to restart connection");
       error(e.message);
@@ -19,15 +27,12 @@ const path = `${env.basePath}/${env.clientId}`;
   }
 })();
 
-async function generateSequence(client, initData) {
-  let value = initData;
-  while (true) {
-    await throttle();
-    await preGenerateValidation(client, value);
-    const generated = await generateItem(client, value);
-    await postGenerateValidation(client, generated);
-    value = generated;
-  }
+async function generateNextSequenceValue(client, value) {
+  await throttle();
+  await preGenerateValidation(client, value);
+  const generated = await generateItem(client, value);
+  await postGenerateValidation(client, generated);
+  return generated;
 }
 
 async function postGenerateValidation(client, generated) {

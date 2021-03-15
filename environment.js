@@ -4,6 +4,7 @@ const env = (() => {
     clientId: requireEnv("CLIENT_ID"),
     throttleTimeout: process.env["THROTTLE_TIMEOUT"] ?? 5000,
     basePath: process.env["BASE_PATH"] ?? "/test",
+    logLevel: process.env["LOG_LEVEL"] ?? "info",
   };
 })();
 

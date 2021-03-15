@@ -4,7 +4,7 @@ It writes sequence of numbers to zookeeper. It also validate writes and check if
 
 ## How to use
 
-Project is deckerized so it can be used everywhere with docker. Simple docker example:
+Project is dockerized so it can be used everywhere with docker. Simple docker example:
 
 ```
 docker run -it --rm -e ZOO_HOST="zooip" -e CLIENT_ID="uniqueid" krewilone/zookeeper-test
@@ -43,4 +43,4 @@ spec:
 
 ## ENV variables
 
-You have to provide 2 env variables: **ZOO_HOST** and **CLIENT_ID**. **ZOO_HOST** is ip of zookeeper and **CLIENT_ID** should be unique client identifier. ClientId will be used for resolving zookeeper path. Default path is /test/${clientId}. /test can be also overriden with env variable **BASE_PATH**. There is one more optional variable called **THROTTLE_TIMEOUT**, which is used for sequence throttling, default is 5000.
+You have to provide 2 env variables: **ZOO_HOST** and **CLIENT_ID**. **ZOO_HOST** is ip of zookeeper and **CLIENT_ID** should be unique client identifier. ClientId will be used for resolving zookeeper path. Default path is /test/${clientId}. /test can be also overriden with env variable **BASE_PATH**. There is one more optional variable called **THROTTLE_TIMEOUT**, which is used for sequence throttling, default is 5000. **LOG_LEVEL** is optional variable, with default to _info_ and accepts _"debug", "info", "error"._
