@@ -10,6 +10,7 @@ function log(logfnc, ...messages) {
   const message = messages.join(" ");
   const log = {
     time: new Date().toLocaleString(),
+    client: env.clientId,
     message,
   };
   if (LevelToPriority[logfnc] >= LevelToPriority[logLevel]) {
