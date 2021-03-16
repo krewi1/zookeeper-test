@@ -5,11 +5,13 @@ const { error, info, debug } = require("./log");
 const path = `${env.basePath}/${env.clientId}`;
 
 (async function run() {
-  let value;
+  let value, currentClient;
   while (true) {
     try {
       info("Connecting");
       const [client, initialValue] = await createClientForPath(env.host, path);
+
+      currentClient = client;
       info("Conntected");
 
       if (!value) {
@@ -23,6 +25,8 @@ const path = `${env.basePath}/${env.clientId}`;
     } catch (e) {
       error("Failed to operate! Going to restart connection");
       error(e.message);
+    } finally {
+      currentClient.close();
     }
   }
 })();
