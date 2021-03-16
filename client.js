@@ -23,7 +23,7 @@ async function createClientForPath(host, path) {
 async function getData(client, path) {
   return new Promise((res, rej) => {
     const timeoutId = setTimeout(
-      () => rej(new Error("Getdata timeout")),
+      () => rej(new Error("Get data timeout")),
       15000
     );
     client.getData(path, (err, data) => {
@@ -38,7 +38,12 @@ async function getData(client, path) {
 
 async function setData(client, path, data) {
   return new Promise((res, rej) => {
+    const timeoutId = setTimeout(
+      () => rej(new Error("Set data timeout")),
+      15000
+    );
     client.setData(path, data, (err, stat) => {
+      clearTimeout(timeoutId);
       if (err) {
         return rej(err);
       }
