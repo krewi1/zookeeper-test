@@ -1,6 +1,10 @@
 const { createClientForPath, getData, setData } = require("./client");
 const { env } = require("./environment");
 const { error, info, debug } = require("./log");
+const {
+  InvalidSequenceError,
+  invalidSequenceType,
+} = require("./invalidSequence");
 
 const path = `${env.basePath}/${env.clientId}`;
 
@@ -25,6 +29,9 @@ const path = `${env.basePath}/${env.clientId}`;
     } catch (e) {
       error("Failed to operate! Going to restart connection");
       error(e.message);
+      if (e.type && e.type === invalidSequenceType) {
+        value = undefined;
+      }
     } finally {
       currentClient.close();
     }
@@ -42,7 +49,7 @@ async function generateNextSequenceValue(client, value) {
 async function postGenerateValidation(client, generated) {
   const nextValue = await getData(client, path);
   if (generated !== +nextValue) {
-    throw new Error("Current value in zookeeper is not equal to generated one");
+    throw new InvalidSequenceError();
   }
   return +nextValue;
 }
@@ -50,7 +57,7 @@ async function postGenerateValidation(client, generated) {
 async function preGenerateValidation(client, value) {
   const current = await getData(client, path);
   if (value !== +current) {
-    throw new Error("Current value is not equal to value in zookeeper");
+    throw new InvalidSequenceError();
   }
 }
 
