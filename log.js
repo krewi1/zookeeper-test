@@ -10,6 +10,7 @@ function log(logfnc, ...messages) {
   const message = messages.join(" ");
   const log = {
     time: new Date().toLocaleString(),
+    level: logfnc,
     client: env.clientId,
     message,
   };

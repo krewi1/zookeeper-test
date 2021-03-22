@@ -75,8 +75,15 @@ async function exists(client, path) {
 }
 
 async function connect(client) {
-  return new Promise((res) => {
-    client.once("connected", res);
+  return new Promise((res, rej) => {
+    const timeoutId = setTimeout(
+      () => rej(new Error("Couldn't connect!")),
+      60000
+    );
+    client.once("connected", () => {
+      clearTimeout(timeoutId);
+      res();
+    });
     client.connect();
   });
 }
