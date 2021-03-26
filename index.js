@@ -15,6 +15,7 @@ const path = `${env.basePath}/${env.clientId}`;
     try {
       info("Connecting");
       const [client, initialValue] = await createClientForPath(env.host, path);
+      retry = 0;
 
       currentClient = client;
       info("Conntected");
