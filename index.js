@@ -10,33 +10,42 @@ const path = `${env.basePath}/${env.clientId}`;
 
 (async function run() {
   let value, currentClient;
-  try {
-    info("Connecting");
-    const [client, initialValue] = await createClientForPath(env.host, path);
+  let retry = 0;
+  while (true) {
+    try {
+      info("Connecting");
+      const [client, initialValue] = await createClientForPath(env.host, path);
 
-    currentClient = client;
-    info("Conntected");
+      currentClient = client;
+      info("Conntected");
 
-    if (!value) {
-      debug("Setting initial value", initialValue);
-      value = initialValue;
+      if (!value) {
+        debug("Setting initial value", initialValue);
+        value = initialValue;
+      }
+      while (true) {
+        value = await generateNextSequenceValue(client, value);
+        debug("Gererating sequence value", value);
+      }
+    } catch (e) {
+      error("Failed to operate! Going to restart connection");
+      error(e.message);
+      if (e.type && e.type === invalidSequenceType) {
+        value = undefined;
+      }
+    } finally {
+      if (currentClient) {
+        currentClient.close();
+      }
+      debug("Sleeping after fail");
+      await new Promise((res) => setTimeout(res, env.sleepBeforeExit));
+      if (retry >= env.retryConnection) {
+        debug("Going to exit");
+        process.exit(0);
+      }
+      info("Going to retry");
+      retry++;
     }
-    while (true) {
-      value = await generateNextSequenceValue(client, value);
-      debug("Gererating sequence value", value);
-    }
-  } catch (e) {
-    error("Failed to operate! Going to restart connection");
-    error(e.message);
-    if (e.type && e.type === invalidSequenceType) {
-      value = undefined;
-    }
-  } finally {
-    currentClient.close();
-    debug("Sleeping before exit");
-    await new Promise((res) => setTimeout(res, 30000));
-    debug("Going to exit");
-    process.exit(0);
   }
 })();
 

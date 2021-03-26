@@ -5,6 +5,8 @@ const env = (() => {
     throttleTimeout: process.env["THROTTLE_TIMEOUT"] ?? 5000,
     basePath: process.env["BASE_PATH"] ?? "/test",
     logLevel: process.env["LOG_LEVEL"] ?? "info",
+    sleepBeforeExit: process.env["EXIT_SLEEP"] ?? 30000,
+    retryConnection: process.env["CONNECTION_RETRY"] ?? 0,
   };
 })();
 
